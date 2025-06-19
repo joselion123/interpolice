@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="./src/css/estilo.css">
     <style>
         * {
             margin: 0;
@@ -172,6 +173,199 @@
             margin-bottom: 20px;
         }
 
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        .modal-dialog {
+            max-width: 600px;
+            width: 90%;
+            margin: 20px;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-dialog {
+            transform: scale(1);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .btn-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-close::before {
+            content: "×";
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+            color: #333;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        input[type="file"] {
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-style: dashed;
+        }
+
+        input[type="file"]:focus {
+            background: white;
+            border-style: solid;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            padding: 10px;
+        }
+
+        .modal-footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -189,6 +383,30 @@
             h1 {
                 font-size: 1.8em;
             }
+
+            .modal-dialog {
+                width: 95%;
+                margin: 10px;
+            }
+
+            .modal-header,
+            .modal-body,
+            .modal-footer {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
         }
 
         @media (max-width: 480px) {
@@ -197,6 +415,46 @@
                 overflow-x: auto;
                 white-space: nowrap;
             }
+
+            .modal-body {
+                max-height: 60vh;
+            }
+        }
+
+        /* Animaciones adicionales */
+        @keyframes fadeInModal {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal.show .modal-dialog {
+            animation: fadeInModal 0.3s ease-out;
+        }
+
+        /* Mejoras en la accesibilidad */
+        input:invalid {
+            border-color: #e74c3c;
+        }
+
+        input:invalid:focus {
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+
+        /* Estados de los campos */
+        .form-group.has-error input {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+        }
+
+        .form-group.has-success input {
+            border-color: #27ae60;
+            background: #f2fdf5;
         }
     </style>
 </head>
@@ -216,6 +474,7 @@
                     <th scope="col">foto</th>
                     <th scope="col">codigo qr</th>
                     <th scope="col">estado</th>
+                    <th scope="col">acción</th>
                 </tr>
             </thead>
             <tbody id="tablaCiudadanos">
@@ -223,6 +482,83 @@
         </table>
     </div>
 
-    <script src="./src/js/main.js"></script>
+    <div class="modal" id="modalEdicion" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar ciudadano</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="codigo">Código <span class="required">*</span></label>
+                            <input type="number" id="codigo" name="codigo" placeholder="Ej: 999887776665554" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nombre">Nombre <span class="required">*</span></label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Nombre del ciudadano" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apellidos">Apellidos</label>
+                            <input type="text" id="apellidos" name="apellidos" placeholder="Apellidos (opcional)">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apodo">Apodo o Nickname</label>
+                            <input type="text" id="apodo" name="apodo" placeholder="Apodo o remoquete">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fecha_nacimiento">Fecha de Nacimiento <span class="required">*</span></label>
+                            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="planeta_origen">Planeta de Origen <span class="required">*</span></label>
+                                <input type="text" id="planeta_origen" name="planeta_origen" placeholder="Planeta donde nació" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="planeta_residencia">Planeta de Residencia <span class="required">*</span></label>
+                                <input type="text" id="planeta_residencia" name="planeta_residencia" placeholder="Planeta donde reside" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="foto">Fotografía</label>
+                            <input type="file" id="foto" name="foto" accept="image/*" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="codigo_qr">Código QR <span class="required">*</span></label>
+                            <input type="text" id="codigo_qr" name="codigo_qr" placeholder="Identificador QR tatuado" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado">Estado del Ciudadano <span class="required">*</span></label>
+                            <select id="estado" name="estado" required>
+                                <option value="">Seleccionar estado</option>
+                                <option value="0">Muerto</option>
+                                <option value="1">Vivo</option>
+                                <option value="2">Congelado (Criogenia)</option>
+                            </select>
+                        </div>
+                          <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+                    </form>
+                </div>
+              
+            </div>
+        </div>
+    </div>
+    
+
+    <script src="./src/js/ciudadanos.js" type="module"></script>
 </body>
 </html>
