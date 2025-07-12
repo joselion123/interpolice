@@ -24,6 +24,8 @@ async function cargarCiudadanos(ciudadanos) {
                 <td><img src="${ciudadano.foto}" width="60"  /></td>
                 <td>${ciudadano.codigo_qr}</td>
                 <td>${ciudadano.estado}</td>
+                <td>${ciudadano.rol}</td>
+
                 <td> <button type="button" class="btn btn-primary btnEditar" data-codigo="${ciudadano.codigo}">Editar</button> <br> <button type="button" class="btn btn-danger btnEliminar" data-codigo="${ciudadano.codigo}">Eliminar</button>
 
                 </td>

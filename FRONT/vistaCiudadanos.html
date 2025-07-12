@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil Ciudadano - Interpolice Galáctico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a23 0%, #1a0a40 50%, #2a0a60 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            color: #00ffff;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px #00ffff;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .header .subtitle {
+            color: #ffd700;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .citizen-info {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+
+        .citizen-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            color: #000;
+        }
+
+        .info-field {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #00ffff;
+        }
+
+        .info-label {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #ffffff;
+            font-size: 1.1em;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .status.vivo {
+            background: #2ed573;
+            color: #000;
+        }
+
+        .status.muerto {
+            background: #ff4757;
+            color: #fff;
+        }
+
+        .status.congelado {
+            background: #70a1ff;
+            color: #000;
+        }
+
+        .criminal-record {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .record-title {
+            color: #ff6b6b;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .crime-count {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .crime-item {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .crime-item:hover {
+            background: rgba(255, 107, 107, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .crime-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .crime-date {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .crime-severity {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .severity-alto {
+            background: #ff4757;
+            color: white;
+        }
+
+        .severity-medio {
+            background: #ffa502;
+            color: white;
+        }
+
+        .severity-bajo {
+            background: #2ed573;
+            color: black;
+        }
+
+        .crime-location {
+            color: #00ffff;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .crime-types {
+            margin-bottom: 15px;
+        }
+
+        .crime-type {
+            display: inline-block;
+            background: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin: 2px;
+            border: 1px solid rgba(0, 255, 255, 0.4);
+        }
+
+        .crime-description {
+            color: #ffffff;
+            line-height: 1.5;
+            font-style: italic;
+            border-left: 3px solid #ff6b6b;
+            padding-left: 15px;
+        }
+
+        .no-crimes {
+            text-align: center;
+            padding: 50px;
+            color: #2ed573;
+            font-size: 1.2em;
+        }
+
+        .no-crimes::before {
+            content: "✅";
+            font-size: 3em;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .print-btn {
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            border: none;
+            border-radius: 25px;
+            color: #000;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .logout-btn {
+                position: relative;
+                margin-bottom: 20px;
+            }
+
+            .citizen-photo {
+                width: 120px;
+                height: 120px;
+                font-size: 3em;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .logout-btn, .print-btn {
+                display: none;
+            }
+            
+            .main-container {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="logout-btn" onclick="logout()">🚪 Cerrar Sesión</button>
+
+    <div class="header">
+        <h1>INTERPOLICE GALÁCTICO</h1>
+        <div class="subtitle">Sistema de Consulta Ciudadana</div>
+    </div>
+
+    <div class="main-container">
+        <!-- Información del Ciudadano -->
+        <div class="citizen-info">
+            <div class="citizen-photo" id="citizenPhoto">👤</div>
+            
+            <div class="info-field">
+                <div class="info-label">Nombre Completo</div>
+                <div class="info-value" id="citizenName">Juan Carlos Vega Martínez</div>
+            </div>
+
+            <div class="info-field">
+                <div class="info-label">Código QR Universal</div>
+                <div class="info-value" id="citizenQR">QR-7834-9821-ALPHA</div>
+            </div>
+
+            <div class="info-field">
+                <div class="info-label">Fecha de Nacimiento</div>
+                <div class="info-value" id="citizenBirth">15 de Marzo, 2387</div>
+            </div>
+
+            <div class="info-field">
+                <div class="info-label">Planeta de Origen</div>
+                <div class="info-value" id="citizenOrigin">Kepler-442b</div>
+            </div>
+
+            <div class="info-field">
+                <div class="info-label">Planeta de Residencia</div>
+                <div class="info-value" id="citizenResidence">Tierra - Sector 7</div>
+            </div>
+
+            <div class="info-field">
+                <div class="info-label">Estado Actual</div>
+                <div class="info-value">
+                    <span class="status vivo" id="citizenStatus">VIVO</span>
+                </div>
+            </div>
+
+            <div class="info-field">
+                <div class="info-label">Fecha de Registro</div>
+                <div class="info-value" id="registrationDate">02 de Julio, 2425</div>
+            </div>
+
+            <button class="print-btn" onclick="printRecord()">🖨️ Imprimir Antecedentes</button>
+        </div>
+
+        <!-- Historial Criminal -->
+        <div class="criminal-record">
+            <div class="record-header">
+                <div class="record-title">📋 Historial Criminal</div>
+                <div class="crime-count" id="crimeCount">3 Delitos Registrados</div>
+            </div>
+
+            <div id="crimesList">
+                <!-- Delito 1 -->
+                <div class="crime-item">
+                    <div class="crime-header">
+                        <div class="crime-date">🕐 24 de Junio, 2425 - 23:45h</div>
+                        <div class="crime-severity severity-alto">GRAVEDAD ALTA</div>
+                    </div>
+                    <div class="crime-location">📍 Sector Comercial Alpha-7, Estación Espacial Omega</div>
+                    <div class="crime-types">
+                        <span class="crime-type">Conducción bajo efectos</span>
+                        <span class="crime-type">Daño a bien ajeno</span>
+                        <span class="crime-type">Lesiones personales</span>
+                        <span class="crime-type">Intento de homicidio</span>
+                    </div>
+                    <div class="crime-description">
+                        "El sujeto conducía una nave bajo efectos de sustancias psicotrópicas cuando colisionó contra un puesto de comida espacial. Al ser confrontado por las autoridades, intentó agredir al oficial Smith con un desintegrador láser. Causó lesiones menores a 3 ciudadanos que se encontraban en el área."
+                    </div>
+                </div>
+
+                <!-- Delito 2 -->
+                <div class="crime-item">
+                    <div class="crime-header">
+                        <div class="crime-date">🕐 12 de Mayo, 2425 - 14:20h</div>
+                        <div class="crime-severity severity-medio">GRAVEDAD MEDIA</div>
+                    </div>
+                    <div class="crime-location">📍 Plaza Central, Ciudad Nueva Terra</div>
+                    <div class="crime-types">
+                        <span class="crime-type">Alteración del orden público</span>
+                        <span class="crime-type">Resistencia a la autoridad</span>
+                    </div>
+                    <div class="crime-description">
+                        "Durante una manifestación pacífica, el ciudadano incitó a la violencia contra las fuerzas del orden. Cuando fue requerido por los agentes, se resistió físicamente al arresto y tuvo que ser reducido con aturdidor neural."
+                    </div>
+                </div>
+
+                <!-- Delito 3 -->
+                <div class="crime-item">
+                    <div class="crime-header">
+                        <div class="crime-date">🕐 03 de Enero, 2425 - 08:15h</div>
+                        <div class="crime-severity severity-bajo">GRAVEDAD BAJA</div>
+                    </div>
+                    <div class="crime-location">📍 Puerto Espacial Gamma, Zona de Aduanas</div>
+                    <div class="crime-types">
+                        <span class="crime-type">Contrabando menor</span>
+                    </div>
+                    <div class="crime-description">
+                        "El ciudadano intentó ingresar 5 unidades de café terrestre sin declarar en su equipaje. Al ser detectado por los escáneres de rayos X cuánticos, confesó inmediatamente y colaboró con las autoridades."
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="./src/js/vistaCiudadano.js" type="module"></script>
+</html>

@@ -13,6 +13,9 @@ const planetaresidencia=document.querySelector('#planeta_residencia');
 const foto= document.querySelector('#foto');
 const codigoqr= document.querySelector('#codigo_qr');
 const estado=document.querySelector('#estado');
+const rol=document.querySelector('#rol');
+const password=document.querySelector('#password');
+
 
 document.querySelector('#btnGuardar').addEventListener('click', async (e) => {
     e.preventDefault(); 
@@ -25,7 +28,6 @@ document.querySelector('#btnGuardar').addEventListener('click', async (e) => {
     }
 
     const nuevoCiudadano = {
-        codigo: codigo.value,
         nombre: nombre.value,
         apellidos: apellidos.value,
         apodo: apodo.value,
@@ -34,7 +36,9 @@ document.querySelector('#btnGuardar').addEventListener('click', async (e) => {
         planeta_residencia: planetaresidencia.value,
         foto: base64,
         codigo_qr: codigoqr.value,
-        estado: estado.value
+        estado: estado.value,
+        rol: rol.value,
+        pass:password.value
     };
     console.log(nuevoCiudadano)
     try {

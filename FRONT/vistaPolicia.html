@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Policía - Interpolice Galáctico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a23 0%, #1a0a40 50%, #2a0a60 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .police-badge {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .header-info h1 {
+            color: #00ffff;
+            font-size: 1.8em;
+            text-shadow: 0 0 15px #00ffff;
+            margin-bottom: 5px;
+        }
+
+        .officer-info {
+            color: #ffd700;
+            font-size: 0.9em;
+        }
+
+        .logout-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .search-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            height: fit-content;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-title {
+            color: #00ffff;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-methods {
+            margin-bottom: 25px;
+        }
+
+        .method-btn {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            color: #ffffff;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .method-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: #00ffff;
+        }
+
+        .method-btn.active {
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .search-input-group {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #2ed573, #26d0ce);
+            border: none;
+            border-radius: 15px;
+            color: #000;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 213, 115, 0.4);
+        }
+
+        .qr-scanner {
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .qr-scanner.active {
+            display: block;
+        }
+
+        .results-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            min-height: 600px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .results-title {
+            color: #00ffff;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .print-btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border: none;
+            border-radius: 15px;
+            color: #000;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .citizen-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .citizen-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .citizen-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: #000;
+        }
+
+        .citizen-details h3 {
+            color: #00ffff;
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .citizen-details p {
+            color: #ffffff;
+            margin-bottom: 3px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status-clean {
+            background: #2ed573;
+            color: #000;
+        }
+
+        .status-criminal {
+            background: #ff4757;
+            color: #fff;
+        }
+
+        .crimes-section {
+            margin-top: 20px;
+        }
+
+        .crimes-header {
+            color: #ff6b6b;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .crime-summary {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .crime-date {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .crime-location {
+            color: #00ffff;
+            font-size: 0.8em;
+            margin: 5px 0;
+        }
+
+        .crime-types-summary {
+            margin: 8px 0;
+        }
+
+        .crime-type-tag {
+            display: inline-block;
+            background: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.7em;
+            margin: 1px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        .no-results::before {
+            content: "🔍";
+            font-size: 3em;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 255, 255, 0.3);
+            border-top: 4px solid #00ffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-left {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .search-panel, .results-panel {
+                padding: 20px;
+            }
+
+            .citizen-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .header, .search-panel, .print-btn, .logout-btn, .action-btn {
+                display: none;
+            }
+            
+            .main-container {
+                display: block;
+            }
+
+            .results-panel {
+                background: white;
+                border: 1px solid black;
+            }
+        }
+        .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-container {
+    background: linear-gradient(135deg, #1a0a40 0%, #2a0a60 50%, #0a0a23 100%);
+    border: 2px solid rgba(0, 255, 255, 0.4);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 255, 255, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px;
+    border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-title {
+    color: #00ffff;
+    font-size: 1.8em;
+    font-weight: bold;
+    text-shadow: 0 0 15px #00ffff;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    font-size: 2em;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 107, 107, 0.2);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.form-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 15px;
+}
+
+.section-title {
+    color: #ffd700;
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #ffd700;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #00ffff;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.form-input, .form-textarea {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.form-input::placeholder, .form-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-input:read-only {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: 'Arial', sans-serif;
+}
+
+.modal-footer {
+    padding: 25px;
+    border-top: 2px solid rgba(0, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.btn-cancel, .btn-save {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 140px;
+}
+
+.btn-cancel {
+    background: linear-gradient(45deg, #ff6b6b, #ff4757);
+    color: white;
+}
+
+.btn-cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+}
+
+.btn-save {
+    background: linear-gradient(45deg, #2ed573, #26d0ce);
+    color: #000;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(46, 213, 115, 0.4);
+}
+
+/* Responsive para la modal */
+@media (max-width: 768px) {
+    .modal-container {
+        margin: 10px;
+        max-height: 95vh;
+    }
+    
+    .modal-header, .modal-body, .modal-footer {
+        padding: 20px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .btn-cancel, .btn-save {
+        width: 100%;
+    }
+}
+
+/* Animaciones */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-overlay {
+    animation: modalFadeIn 0.3s ease-out;
+}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="police-badge">👮</div>
+            <div class="header-info">
+                <h1>PANEL POLICÍA</h1>
+                <div class="officer-info">Oficial: <span id="officerName">María González</span> | Placa: <span id="badgeNumber">P-2847</span></div>
+            </div>
+            <button class="action-btn add-crime" onclick="openCrimeModal('código', 'nombre')">🚨 Agregar Crimen</button>
+
+
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 Cerrar Sesión</button>
+    </div>
+
+
+
+
+    <div class="main-container">
+        <!-- Panel de Búsqueda -->
+        <div class="search-panel">
+            <div class="search-title">🔍 Consulta de Antecedentes</div>
+            
+            <div class="search-methods">
+                <button class="method-btn active" onclick="selectMethod('qr')">
+                    📱 Escanear Código QR
+                </button>
+                <button class="method-btn" onclick="selectMethod('code')">
+                    🔢 Código Universal
+                </button>
+                <button class="method-btn" onclick="selectMethod('name')">
+                    👤 Nombre del Ciudadano
+                </button>
+            </div>
+
+            <!-- Escáner QR -->
+            <div class="qr-scanner active" id="qrScanner">
+                <div style="font-size: 3em; margin-bottom: 10px;">📷</div>
+                <p>Apunte la cámara al código QR del ciudadano</p>
+                <button class="search-btn" onclick="simulateQRScan()">🔄 Simular Escaneo</button>
+            </div>
+
+            <!-- Búsqueda por código -->
+            <div class="search-input-group" id="codeSearch" style="display: none;">
+                <input type="text" class="search-input" id="codeInput" placeholder="Ej: QR-7834-9821-ALPHA">
+                <button class="search-btn" onclick="searchByCitizen()">🔍 Buscar</button>
+            </div>
+
+            <!-- Búsqueda por nombre -->
+            <div class="search-input-group" id="nameSearch" style="display: none;">
+                <input type="text" class="search-input" id="nameInput" placeholder="Nombre completo del ciudadano">
+                <button class="search-btn" onclick="searchByCitizen()">🔍 Buscar</button>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(0, 255, 255, 0.3);">
+                <p style="color: #ffd700; font-size: 0.9em; text-align: center;">
+                    💡 Tip: Use el escáner QR para consultas más rápidas
+                </p>
+            </div>
+        </div>
+
+        <!-- Panel de Resultados -->
+        <div class="results-panel">
+            <div class="results-header">
+                <div class="results-title">📋 Resultados de Búsqueda</div>
+                <button class="print-btn" id="printBtn" onclick="printResults()">🖨️ Imprimir</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <p>Consultando base de datos galáctica...</p>
+            </div>
+
+            <div class="no-results" id="noResults">
+                Ingrese un método de búsqueda para consultar antecedentes
+            </div>
+
+            <div id="searchResults" style="display: none;">
+                <!-- Los resultados se cargarán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="crimeModal" style="display: none;">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2 class="modal-title">⚖️ Registrar Nuevo Crimen</h2>
+            <button class="modal-close" onclick="closeCrimeModal()">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <form id="crimeForm">
+                <!-- Datos del Ciudadano -->
+                <div class="form-section">
+                    <h3 class="section-title">👤 Datos del Ciudadano</h3>
+                    <div class="form-group">
+                        <label>Código Universal del Ciudadano</label>
+                        <input type="text" id="citizenCode" class="form-input" placeholder="QR-7834-9821-ALPHA" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="citizenName" class="form-input" placeholder="Nombre del ciudadano" readonly>
+                    </div>
+                </div>
+
+                <!-- Información del Crimen -->
+                <div class="form-section">
+                    <h3 class="section-title">🚨 Información del Crimen</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha del Incidente</label>
+                            <input type="date" id="crimeDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Hora del Incidente</label>
+                            <input type="time" id="crimeTime" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ubicación del Incidente</label>
+                        <input type="text" id="crimeLocation" class="form-input" placeholder="Ej: Sector Alpha-7, Estación Lunar 3" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tipo de Crimen</label>
+                        <select id="crimeType" class="form-input" required>
+                            <option value="">Seleccionar tipo de crimen</option>
+                            <option value="Robo">Robo</option>
+                            <option value="Asalto">Asalto</option>
+                            <option value="Fraude">Fraude</option>
+                            <option value="Vandalismo">Vandalismo</option>
+                            <option value="Contrabando">Contrabando Intergaláctico</option>
+                            <option value="Alteracion Publica">Alteración del Orden Público</option>
+                            <option value="Posesion Ilegal">Posesión Ilegal de Armas</option>
+                            <option value="Trafico">Tráfico de Sustancias</option>
+                            <option value="Pirateria">Piratería Espacial</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="otherCrimeGroup" style="display: none;">
+                        <label>Especificar Otro Tipo</label>
+                        <input type="text" id="otherCrimeType" class="form-input" placeholder="Especificar tipo de crimen">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Nivel de Gravedad</label>
+                        <select id="crimeSeverity" class="form-input" required>
+                            <option value="">Seleccionar gravedad</option>
+                            <option value="Leve">Leve</option>
+                            <option value="Moderado">Moderado</option>
+                            <option value="Grave">Grave</option>
+                            <option value="Muy Grave">Muy Grave</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Detalles del Arresto -->
+                <div class="form-section">
+                    <h3 class="section-title">👮 Detalles del Arresto</h3>
+                    <div class="form-group">
+                        <label>Oficial a Cargo</label>
+                        <input type="text" id="arrestingOfficer" class="form-input" placeholder="Nombre del oficial" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Número de Placa</label>
+                        <input type="text" id="badgeNumber" class="form-input" placeholder="P-2847" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Descripción del Incidente</label>
+                        <textarea id="crimeDescription" class="form-textarea" rows="4" placeholder="Descripción detallada de los hechos..." required></textarea>
+                    </div>
+                </div>
+
+                <!-- Evidencias -->
+                <div class="form-section">
+                    <h3 class="section-title">📋 Evidencias y Testigos</h3>
+                    <div class="form-group">
+                        <label>Evidencias Recolectadas</label>
+                        <textarea id="evidence" class="form-textarea" rows="3" placeholder="Descripción de evidencias físicas, digitales, etc."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Testigos</label>
+                        <textarea id="witnesses" class="form-textarea" rows="3" placeholder="Nombres y contactos de testigos"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" onclick="closeCrimeModal()">❌ Cancelar</button>
+            <button type="button" class="btn-save" onclick="saveCrime()">💾 Registrar Crimen</button>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="./src/js/vistaPolicia.js"></script>
+</html>

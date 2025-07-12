@@ -25,7 +25,6 @@ ciudadano.get("/ciudadano/listarTodos", async(req,res)=>{
 ciudadano.post("/ciudadano/insertar", async (req, res) => {
   try {
     const datosCiudadano = {
-      codigo: req.body.codigo,
       nombre: req.body.nombre,
       apellidos: req.body.apellidos,
       apodo: req.body.apodo,
@@ -35,6 +34,8 @@ ciudadano.post("/ciudadano/insertar", async (req, res) => {
       foto: req.body.foto,
       codigo_qr: req.body.codigo_qr,
       estado: req.body.estado,
+      rol: req.body.rol,
+      pass:req.body.pass,
     };
 
     const consulta = "INSERT INTO ciudadanos SET ?";
@@ -138,5 +139,32 @@ ciudadano.put("/ciudadano/editar/:codigo", async (req, res) => {
     res.status(500).json({ error: "Error al editar ciudadano" });
   }
 });
+
+ciudadano.get("/ciudadano/login/:codigo/:pass", async (req,res)=>{
+  try{
+   let codigo=req.params.codigo
+   let password=req.params.pass
+   let consulta=`select * from ciudadanos where codigo=? and pass=?`
+  let [resultado] = await conexion.query(consulta, [codigo,password]);
+
+   if (resultado.length == 0) {
+      res.send({ res: "No hay datos con el codigo: " + codigo });
+      res.send({
+        estado: "Datos vacios",
+        data: resultado,
+      });
+    }
+    res.send({ resultado });
+    res.send({
+      estado: "ok",
+      data: resultado,
+    });
+  }catch(err){
+ res.status(500).send({
+      estado: "error",
+      data: err.code + "=>" + err.message,
+    })
+  }
+})
 
 export default ciudadano;

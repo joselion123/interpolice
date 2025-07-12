@@ -3,89 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro Galáctico de Ciudadanos</title>
-    <link rel="stylesheet" href="./src/css/estilo.css">
+    <title>Acceso Galáctico - Sistema de Ciudadanos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a23 0%, #1a0a40 50%, #2a0a60 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 450px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #00ffff;
+            font-size: 2.2em;
+            text-shadow: 0 0 20px #00ffff;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .header .subtitle {
+            color: #ffd700;
+            font-size: 1em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: #000;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: #00ffff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .required {
+            color: #ff6b6b;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 1em;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .password-group {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #00ffff;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: #ff00ff;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            border: none;
+            border-radius: 25px;
+            color: #000;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .forgot-password a {
+            color: #ffd700;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .register-link p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .register-btn {
+            background: transparent;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .register-btn:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .security-notice {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 30px;
+            text-align: center;
+            color: #ffd700;
+            font-size: 0.85em;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-top: 2px solid #00ffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .login-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5em;
+            }
+        }
+    </style>
 </head>
 <body>
-  <a href="./ciudadanos.html">
-    <button type="submit" class="submit-btn">Ver ciudadanos</button>
-  </a>
-<a href="./BuscarCiudadanos.html">
-      <button type="submit" class="submit-btn">Buscar ciudadanos</button>
-
-</a>
     <div class="container">
         <div class="header">
-            <h1>REGISTRO GALÁCTICO</h1>
-            <div class="subtitle">Formulario de Ciudadanía Interestelar</div>
+            <div class="login-icon">🚀</div>
+            <h1>ACCESO GALÁCTICO</h1>
+            <div class="subtitle">Sistema de Autenticación Interestelar</div>
         </div>
 
-        <form>
-
-
+        <form id="loginForm">
             <div class="form-group">
-                <label for="nombre">Nombre <span class="required">*</span></label>
-                <input type="text" id="nombre" name="nombre" placeholder="Nombre del ciudadano" required>
+                <label for="username">Código<span class="required">*</span></label>
+                <input type="text" id="codigo" name="username" placeholder="Ingrese su identificador" required>
             </div>
 
             <div class="form-group">
-                <label for="apellidos">Apellidos</label>
-                <input type="text" id="apellidos" name="apellidos" placeholder="Apellidos (opcional)">
-            </div>
-
-            <div class="form-group">
-                <label for="apodo">Apodo o Nickname</label>
-                <input type="text" id="apodo" name="apodo" placeholder="Apodo o remoquete">
-            </div>
-
-            <div class="form-group">
-                <label for="fecha_nacimiento">Fecha de Nacimiento <span class="required">*</span></label>
-                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="planeta_origen">Planeta de Origen <span class="required">*</span></label>
-                    <input type="text" id="planeta_origen" name="planeta_origen" placeholder="Planeta donde nació" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="planeta_residencia">Planeta de Residencia <span class="required">*</span></label>
-                    <input type="text" id="planeta_residencia" name="planeta_residencia" placeholder="Planeta donde reside" required>
+                <label for="password">Clave de Acceso <span class="required">*</span></label>
+                <div class="password-group">
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="foto">Fotografía</label>
-                <input type="file" id="foto" name="foto" accept="image/*">
+                <label for="planet">Planeta de Origen</label>
+                <input type="text" id="planeta" name="planet" placeholder="Para verificación adicional (opcional)">
             </div>
 
-            <div class="form-group">
-                <label for="codigo_qr">Código QR <span class="required">*</span></label>
-                <input type="text" id="codigo_qr" name="codigo_qr" placeholder="Identificador QR tatuado" required>
-            </div>
+            <button type="submit" class="submit-btn" id="loginBtn">Iniciar Sesión</button>
+            
+            <div class="loading" id="loading"></div>
 
-            <div class="form-group">
-                <label for="estado">Estado del Ciudadano <span class="required">*</span></label>
-                <select id="estado" name="estado" required>
-                    <option value="">Seleccionar estado</option>
-                    <option value="0">Muerto</option>
-                    <option value="1">Vivo</option>
-                    <option value="2">Congelado (Criogenia)</option>
-                </select>
+            <div class="forgot-password">
+                <a href="#" onclick="forgotPassword()">¿Olvidaste tu clave de acceso?</a>
             </div>
-
-            <button type="button" class="submit-btn" id="btnGuardar">Registrar Ciudadano</button>
         </form>
 
-        <div class="law-notice">
-            <strong>Ley 58000</strong> - Todo ciudadano debe portar identificador QR visible en el tronco o parte visible del cuerpo
+        <div class="register-link">
+            <p>¿No tienes ciudadanía galáctica?</p>
+            <a href="#" class="register-btn" onclick="goToRegister()">Registrarse</a>
+        </div>
+
+        <div class="security-notice">
+            <strong>Protocolo de Seguridad 58001</strong> - Acceso monitoreado por la Federación Intergaláctica
         </div>
     </div>
-
     
-
 </body>
-<script type="module" src="./src/js/ciudadano.js" ></script>
+<script src="./src/js/login.js" type="module"></script>
 </html>

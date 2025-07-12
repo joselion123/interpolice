@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Galáctico de Ciudadanos</title>
+    <link rel="stylesheet" href="./src/css/estilo.css">
+
+</head>
+<body>
+  <a href="./ciudadanos.html">
+    <button type="submit" class="submit-btn">Ver ciudadanos</button>
+  </a>
+<a href="./BuscarCiudadanos.html">
+      <button type="submit" class="submit-btn">Buscar ciudadanos</button>
+
+</a>
+    <div class="container">
+        <div class="header">
+            <h1>REGISTRO GALÁCTICO</h1>
+            <div class="subtitle">Formulario de Ciudadanía Interestelar</div>
+        </div>
+
+        <form>
+
+            <div class="form-group">
+                <label for="nombre">Nombre <span class="required">*</span></label>
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre del ciudadano" required>
+            </div>
+
+            <div class="form-group">
+                <label for="apellidos">Apellidos</label>
+                <input type="text" id="apellidos" name="apellidos" placeholder="Apellidos (opcional)">
+            </div>
+
+            <div class="form-group">
+                <label for="apodo">Apodo o Nickname</label>
+                <input type="text" id="apodo" name="apodo" placeholder="Apodo o remoquete">
+            </div>
+
+            <div class="form-group">
+                <label for="fecha_nacimiento">Fecha de Nacimiento <span class="required">*</span></label>
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="planeta_origen">Planeta de Origen <span class="required">*</span></label>
+                    <input type="text" id="planeta_origen" name="planeta_origen" placeholder="Planeta donde nació" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="planeta_residencia">Planeta de Residencia <span class="required">*</span></label>
+                    <input type="text" id="planeta_residencia" name="planeta_residencia" placeholder="Planeta donde reside" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="foto">Fotografía</label>
+                <input type="file" id="foto" name="foto" accept="image/*">
+            </div>
+
+            <div class="form-group">
+                <label for="codigo_qr">Código QR <span class="required">*</span></label>
+                <input type="text" id="codigo_qr" name="codigo_qr" placeholder="Identificador QR tatuado" required>
+            </div>
+
+            <div class="form-group">
+                <label for="estado">Estado del Ciudadano <span class="required">*</span></label>
+                <select id="estado" name="estado" required>
+                    <option value="">Seleccionar estado</option>
+                    <option value="0">Muerto</option>
+                    <option value="1">Vivo</option>
+                    <option value="2">Congelado (Criogenia)</option>
+                </select>
+            </div>
+
+               <div class="form-group">
+                <label for="rol">Rol <span class="required">*</span></label>
+                <select id="rol" name="rol" required>
+                    <option value="">Seleccionar rol</option>
+                    <option value="ciudadano">Ciudadano</option>
+                    <option value="policia">Policia</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" placeholder="********">
+            </div>
+
+            <button type="button" class="submit-btn" id="btnGuardar">Registrar Ciudadano</button>
+        </form>
+
+        <div class="law-notice">
+            <strong>Ley 58000</strong> - Todo ciudadano debe portar identificador QR visible en el tronco o parte visible del cuerpo
+        </div>
+    </div>
+
+    
+
+</body>
+<script type="module" src="./src/js/ciudadano.js" ></script>
+</html>
