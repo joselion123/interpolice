@@ -18,57 +18,43 @@ const password=document.querySelector('#password');
 
 
 document.querySelector('#btnGuardar').addEventListener('click', async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
 
-    let base64 = "";
-
-    const archivo = foto.files[0];
-    if (archivo) {
-        base64 = await convertirBase64(archivo);
+    const formData = new FormData();
+    
+    // Agregar todos los campos del formulario
+    formData.append('nombre', nombre.value);
+    formData.append('apellidos', apellidos.value);
+    formData.append('apodo', apodo.value);
+    formData.append('fecha_nacimiento', fechanacimiento.value);
+    formData.append('planeta_origen', planetaorigen.value);
+    formData.append('planeta_residencia', planetaresidencia.value);
+    formData.append('codigo_qr', codigoqr.value);
+    formData.append('estado', estado.value);
+    formData.append('rol', rol.value);
+    formData.append('pass', password.value);
+    
+    if (foto.files[0]) {
+        formData.append('foto', foto.files[0]);
     }
 
-    const nuevoCiudadano = {
-        nombre: nombre.value,
-        apellidos: apellidos.value,
-        apodo: apodo.value,
-        fecha_nacimiento: fechanacimiento.value,
-        planeta_origen: planetaorigen.value,
-        planeta_residencia: planetaresidencia.value,
-        foto: base64,
-        codigo_qr: codigoqr.value,
-        estado: estado.value,
-        rol: rol.value,
-        pass:password.value
-    };
-    console.log(nuevoCiudadano)
     try {
         const respuesta = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(nuevoCiudadano)
+            body: formData
         });
 
         const resultado = await respuesta.json();
 
         if (respuesta.ok) {
             Swal.fire('Éxito', 'Ciudadano registrado correctamente', 'success');
+            document.querySelector('form').reset();
         } else {
             Swal.fire('Error', resultado.message || 'Error al registrar ciudadano', 'error');
         }
 
     } catch (error) {
         Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
-        console.error(error);
+        console.error('Error:', error);
     }
 });
-
-function convertirBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}

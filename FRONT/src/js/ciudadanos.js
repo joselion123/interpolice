@@ -11,8 +11,16 @@ async function cargarCiudadanos(ciudadanos) {
         const cuerpoTabla = document.querySelector('#tablaCiudadanos');
         cuerpoTabla.innerHTML = ""; 
        
-        ciudadanos.forEach(ciudadano => {
+        for (const ciudadano of ciudadanos) {
             const fila = document.createElement("tr");
+            let qrImg = '';
+            try {
+                const qrResp = await fetch(`http://localhost:4300/ciudadano/qr/${ciudadano.codigo}`);
+                const qrData = await qrResp.json();
+                qrImg = `<img src='${qrData.qr}' width='60' />`;
+            } catch (err) {
+                qrImg = 'Error QR';
+            }
             fila.innerHTML = `
                 <td>${ciudadano.codigo}</td>
                 <td>${ciudadano.nombre}</td>
@@ -22,7 +30,7 @@ async function cargarCiudadanos(ciudadanos) {
                 <td>${ciudadano.planeta_origen}</td>
                 <td>${ciudadano.planeta_residencia}</td>
                 <td><img src="${ciudadano.foto}" width="60"  /></td>
-                <td>${ciudadano.codigo_qr}</td>
+                <td>${qrImg}</td>
                 <td>${ciudadano.estado}</td>
                 <td>${ciudadano.rol}</td>
 
@@ -33,7 +41,7 @@ async function cargarCiudadanos(ciudadanos) {
             `;
 
             cuerpoTabla.appendChild(fila);
-        });
+        }
 
     } catch (err) {
         console.log("Error al llenar la tabla:", err.message);
