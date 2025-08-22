@@ -49,6 +49,7 @@ document.querySelector('#btnGuardar').addEventListener('click', async (e) => {
         if (respuesta.ok) {
             Swal.fire('Éxito', 'Ciudadano registrado correctamente', 'success');
             document.querySelector('form').reset();
+            window.location.href = './index.html';
         } else {
             Swal.fire('Error', resultado.message || 'Error al registrar ciudadano', 'error');
         }

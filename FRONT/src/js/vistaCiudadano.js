@@ -1,8 +1,11 @@
+let codigoglobal=""
 document.addEventListener('DOMContentLoaded', async () => {
     let codigo = sessionStorage.getItem('codigo');
     if (!codigo) {
         window.location.href = "../../index.html";
         return;
+    }else{
+        codigoglobal=codigo
     }
 
     await inicializarVista();
@@ -16,8 +19,12 @@ let citizenData = {};
 
 async function inicializarVista() {
     const datosCiudadano = await Buscarporcodigo();
+    
+    console.log("Código buscado:", codigoglobal);
+    console.log("Datos recibidos:", datosCiudadano);
+    
     if (!datosCiudadano || datosCiudadano.length === 0) {
-        alert("❌ No se encontró el ciudadano");
+        alert(`❌ No se encontró el ciudadano con código: ${codigoglobal}`);
         return;
     }
 
@@ -37,15 +44,21 @@ async function inicializarVista() {
         photo: "👤"
     };
 
-    loadCitizenData(); 
+    loadCitizenData();
+    await cargarCrimenes();
 }
 
 async function Buscarporcodigo() {
-    let codigo = sessionStorage.getItem('codigo');
-    const urll = `http://localhost:4300/ciudadano/buscarporcodigo/${codigo}`;
+    const urll = `http://localhost:4300/ciudadano/buscarporcodigo/${codigoglobal}`;
     const response = await fetch(urll);
     const datos = await response.json();
-    return datos.resultado;
+    
+    if (datos.estado === "ok") {
+        return datos.data; 
+    } else {
+        console.log("Backend response:", datos);
+        return null; 
+    }
 }
 
 const citizenStates = [
@@ -67,4 +80,101 @@ function loadCitizenData() {
     const currentState = citizenStates.find(s => s.status === citizenData.status);
     statusElement.textContent = currentState.text;
     statusElement.className = `status ${currentState.class}`;
+}
+
+async function traerCrimenesPorCodigo() {
+    try {
+        const url = `http://localhost:4300/crimenes/porcodigo/${codigoglobal}`;
+        const response = await fetch(url);
+        const datos = await response.json();
+        
+        console.log("Crímenes obtenidos:", datos);
+        
+        if (datos.estado === "ok") {
+            return datos.data;
+        } else {
+            console.log("No se encontraron crímenes:", datos.mensaje);
+            return [];
+        }
+    } catch (error) {
+        console.error("Error al obtener crímenes:", error);
+        return [];
+    }
+}
+
+async function cargarCrimenes() {
+    const crimenes = await traerCrimenesPorCodigo();
+    renderizarCrimenes(crimenes);
+}
+
+function renderizarCrimenes(crimenes) {
+    const crimesList = document.getElementById('crimesList');
+    const crimeCount = document.getElementById('crimeCount');
+    
+    if (!crimenes || crimenes.length === 0) {
+        crimesList.innerHTML = `
+            <div class="no-crimes">
+                Ciudadano sin antecedentes criminales
+            </div>
+        `;
+        crimeCount.textContent = "0 Delitos Registrados";
+        return;
+    }
+    
+    crimeCount.textContent = `${crimenes.length} Delito${crimenes.length > 1 ? 's' : ''} Registrado${crimenes.length > 1 ? 's' : ''}`;
+    
+    const crimenesHTML = crimenes.map(crimen => {
+        const fecha = new Date(crimen.hora_crimen);
+        const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        const nivelGravedad = crimen.gravedad_crimen ? crimen.gravedad_crimen.toLowerCase() : 'media';
+        const gravedadClass = `severity-${nivelGravedad}`;
+        const gravedadText = {
+            'alta': 'GRAVEDAD ALTA',
+            'media': 'GRAVEDAD MEDIA', 
+            'baja': 'GRAVEDAD BAJA'
+        }[nivelGravedad] || 'GRAVEDAD MEDIA';
+        
+        const estadoCaso = crimen.estado_caso || 'ABIERTO';
+        const estadoColor = {
+            'ABIERTO': '#ff6b6b',
+            'CERRADO': '#2ed573',
+            'EN_PROCESO': '#ffa502'
+        }[estadoCaso] || '#ff6b6b';
+        
+        return `
+            <div class="crime-item">
+                <div class="crime-header">
+                    <div class="crime-date">🕐 ${fechaFormateada} h</div>
+                    <div class="crime-severity ${gravedadClass}">${gravedadText}</div>
+                </div>
+                <div class="crime-location">📍 ID Crimen: ${crimen.id}</div>
+                <div class="crime-planet">🪐 Planeta del crimen: ${crimen.lugar_crimen || 'No especificado'}</div>
+                <div class="crime-types">
+                    <span class="crime-type">Tipo crimen: ${crimen.tipos_crimen}</span>
+                    ${crimen.ciudadano_codigo ? `<span class="crime-type">Código criminal: ${crimen.ciudadano_codigo}</span>` : ''}
+                </div>
+                <div class="crime-description">
+                    "${crimen.descripcion_crimen || 'Descripción no disponible'}"
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    crimesList.innerHTML = crimenesHTML;
+}
+
+// Función para cerrar sesión
+function logout() {
+    sessionStorage.clear();
+    window.location.href = "../../index.html";
+}
+
+// Función para imprimir antecedentes
+function printRecord() {
+    window.print();
 }

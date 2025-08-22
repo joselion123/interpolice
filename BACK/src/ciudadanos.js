@@ -7,7 +7,6 @@ import { upload, handleMulterErrors } from './config/multerConfig.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-// JWT Secret Key - In production, store this in an environment variable
 const JWT_SECRET = 'tu_clave_secreta_super_segura';
 const JWT_EXPIRES_IN = '1h'; // Token expires in 1 hour
 
@@ -37,7 +36,6 @@ ciudadano.get("/ciudadano/listarTodos", async(req,res)=>{
     }
 });
 
-// Ruta para insertar un nuevo ciudadano con manejo de archivos
 ciudadano.post("/ciudadano/insertar", (req, res, next) => {
     upload(req, res, function(err) {
         if (err) {
@@ -53,12 +51,10 @@ ciudadano.post("/ciudadano/insertar", (req, res, next) => {
   try {
     let fotoPath = '';
     
-    // Si se subió un archivo, guardar la ruta relativa
     if (req.file) {
       fotoPath = '/uploads/' + req.file.filename;
     }
 
-    // Hash the password before saving
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.pass, salt);
 
@@ -178,7 +174,6 @@ ciudadano.post("/ciudadano/login", async (req, res) => {
   try {
     const { codigo, pass } = req.body;
     
-    // First, find the user by codigo
     const [users] = await conexion.query('SELECT * FROM ciudadanos WHERE codigo = ?', [codigo]);
     
     if (users.length === 0) {
@@ -190,7 +185,6 @@ ciudadano.post("/ciudadano/login", async (req, res) => {
     
     const user = users[0];
     
-    // Compare the provided password with the hashed password in the database
     const isPasswordValid = await bcrypt.compare(pass, user.pass);
     
     if (!isPasswordValid) {

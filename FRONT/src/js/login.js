@@ -1,30 +1,25 @@
 // API Base URL
 const API_BASE = 'http://localhost:4300';
 
-// DOM Elements
 const loginForm = document.getElementById('loginForm');
 const loginBtn = document.getElementById('loginBtn');
 const loading = document.getElementById('loading');
 
-// Initialize login functionality
 document.addEventListener('DOMContentLoaded', function() {
     loginForm.addEventListener('submit', handleLogin);
 });
 
-// Handle login form submission
 async function handleLogin(e) {
     e.preventDefault();
     
     const codigo = document.getElementById('codigo').value.trim();
     const password = document.getElementById('password').value;
     
-    // Validation
     if (!codigo || !password) {
         showAlert('Por favor, complete todos los campos obligatorios', 'warning');
         return;
     }
     
-    // Show loading state
     setLoadingState(true);
     
     try {
@@ -45,15 +40,15 @@ async function handleLogin(e) {
             // Store token and user data
             localStorage.setItem('token', data.token);
             localStorage.setItem('userData', JSON.stringify(data.user));
-            
+            sessionStorage.setItem('codigo', codigo);
             showAlert('¡Acceso concedido! Bienvenido al sistema', 'success');
             
             // Redirect based on user role
             setTimeout(() => {
                 if (data.user.rol === 'policia') {
-                    window.location.href = 'vistaPolicia.html';
+                    window.location.href = '../vistaPolicia.html';
                 } else {
-                    window.location.href = 'vistaCiudadanos.html';
+                    window.location.href = '../vistaCiudadanos.html';
                 }
             }, 1500);
             
@@ -92,6 +87,7 @@ function forgotPassword() {
 function goToRegister() {
     window.location.href = 'agregarCiudadanos.html';
 }
+
 
 // Set loading state
 function setLoadingState(isLoading) {

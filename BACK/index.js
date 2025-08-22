@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import ciudadano from "./src/ciudadanos.js";
 import cors from "cors";
+import crimenes from "./src/crimenes.js";
 
 // Configuración de rutas de archivos
 const __filename = fileURLToPath(import.meta.url);
@@ -24,6 +25,8 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Rutas de la API
 app.use("/", ciudadano);
+app.use("/", crimenes);
+
 
 // Ruta de prueba
 app.get("/", (req, res) => {

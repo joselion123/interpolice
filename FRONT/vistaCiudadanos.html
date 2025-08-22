@@ -197,10 +197,38 @@
         }
 
         .crime-severity {
-            padding: 4px 12px;
-            border-radius: 15px;
+            padding: 8px 16px;
+            border-radius: 25px;
             font-size: 0.8em;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid;
+            text-align: center;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .crime-severity.severity-alta {
+            background: linear-gradient(45deg, rgba(255, 71, 87, 0.2), rgba(255, 55, 66, 0.3));
+            border-color: #ff4757;
+            color: #ff4757;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.4);
+        }
+
+        .crime-severity.severity-media {
+            background: linear-gradient(45deg, rgba(255, 165, 2, 0.2), rgba(255, 149, 0, 0.3));
+            border-color: #ffa502;
+            color: #ffa502;
+            box-shadow: 0 0 15px rgba(255, 165, 2, 0.4);
+        }
+
+        .crime-severity.severity-baja {
+            background: linear-gradient(45deg, rgba(112, 161, 255, 0.2), rgba(83, 82, 237, 0.3));
+            border-color: #70a1ff;
+            color: #70a1ff;
+            box-shadow: 0 0 15px rgba(112, 161, 255, 0.4);
         }
 
         .severity-alto {
