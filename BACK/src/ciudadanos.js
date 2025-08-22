@@ -1,15 +1,30 @@
-import express, {response} from "express";
-
+import express, { response } from "express";
+import path from 'path';
+import { fileURLToPath } from 'url';
 import conexion from "./conexion.js";
+import QRCode from "qrcode";
+import { upload, handleMulterErrors } from './config/multerConfig.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-let ciudadano=express.Router();
+// JWT Secret Key - In production, store this in an environment variable
+const JWT_SECRET = 'tu_clave_secreta_super_segura';
+const JWT_EXPIRES_IN = '1h'; // Token expires in 1 hour
+
+// Obtener el directorio actual
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+let ciudadano = express.Router();
+
+// Configuración para servir archivos estáticos
+ciudadano.use('/uploads', express.static(path.join(__dirname, '../../public/uploads')));
 
 ciudadano.get("/ciudadano/listarTodos", async(req,res)=>{
     let consulta= "SELECT * FROM ciudadanos";
 
     try{
         let [resultado]=await conexion.query(consulta);
-        res.send({resultado});
         res.send({
             estado:"ok",
             data:resultado
@@ -22,8 +37,31 @@ ciudadano.get("/ciudadano/listarTodos", async(req,res)=>{
     }
 });
 
-ciudadano.post("/ciudadano/insertar", async (req, res) => {
+// Ruta para insertar un nuevo ciudadano con manejo de archivos
+ciudadano.post("/ciudadano/insertar", (req, res, next) => {
+    upload(req, res, function(err) {
+        if (err) {
+            return res.status(400).json({
+                estado: 'error',
+                mensaje: err.message || 'Error al subir el archivo',
+                code: err.code
+            });
+        }
+        next();
+    });
+}, handleMulterErrors, async (req, res) => {
   try {
+    let fotoPath = '';
+    
+    // Si se subió un archivo, guardar la ruta relativa
+    if (req.file) {
+      fotoPath = '/uploads/' + req.file.filename;
+    }
+
+    // Hash the password before saving
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.pass, salt);
+
     const datosCiudadano = {
       nombre: req.body.nombre,
       apellidos: req.body.apellidos,
@@ -31,39 +69,37 @@ ciudadano.post("/ciudadano/insertar", async (req, res) => {
       fecha_nacimiento: req.body.fecha_nacimiento,
       planeta_origen: req.body.planeta_origen,
       planeta_residencia: req.body.planeta_residencia,
-      foto: req.body.foto,
+      foto: fotoPath, // Guardar solo la ruta del archivo
       codigo_qr: req.body.codigo_qr,
       estado: req.body.estado,
       rol: req.body.rol,
-      pass:req.body.pass,
+      pass: hashedPassword, // Store the hashed password
     };
 
     const consulta = "INSERT INTO ciudadanos SET ?";
     await conexion.query(consulta, [datosCiudadano]);
 
-    res.status(200).json({ mensaje: "Ciudadano insertado correctamente" });
+    res.status(200).json({ 
+      mensaje: "Ciudadano insertado correctamente",
+      fotoUrl: fotoPath // Opcional: devolver la URL de la imagen
+    });
   } catch (err) {
     console.error("Error al insertar ciudadano:", err.message);
-    res.status(500).json({ error: "Error al insertar ciudadano" });
-  }
-});
-
-ciudadano.get("/ciudadano/listarTodos", async(req,res)=>{
-    let consulta= "SELECT * FROM ciudadanos";
-
-    try{
-        let [resultado]=await conexion.query(consulta);
-        res.send({resultado});
-        res.send({
-            estado:"ok",
-            data:resultado
-        })
-    }catch(err){
-        res.status(500).send({
-            estado:"error",
-            data:"Error 500 en el servidor"
-        })
+    
+    // Si hay un error, eliminar el archivo subido si existe
+    if (req.file) {
+      const fs = await import('fs');
+      const filePath = path.join(__dirname, '../../public/uploads', req.file.filename);
+      fs.unlink(filePath, (unlinkErr) => {
+        if (unlinkErr) console.error('Error al eliminar el archivo:', unlinkErr);
+      });
     }
+    
+    res.status(500).json({ 
+      error: "Error al insertar ciudadano",
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
 });
 
 ciudadano.get("/ciudadano/buscarporcodigo/:codigo", async (req, res) => {
@@ -74,17 +110,16 @@ ciudadano.get("/ciudadano/buscarporcodigo/:codigo", async (req, res) => {
     let [resultado] = await conexion.query(consulta, [codigo]);
     
     if (resultado.length == 0) {
-      res.send({ res: "No hay datos con el codigo: " + codigo });
-      res.send({
+      return res.send({
         estado: "Datos vacios",
         data: resultado,
+        mensaje: "No hay datos con el codigo: " + codigo
       });
     }
 
-    res.send({ resultado });
     res.send({
       estado: "ok",
-      data: resultado,
+      data: resultado
     });
   }
   catch (e) {
@@ -103,7 +138,6 @@ ciudadano.delete("/ciudadano/eliminarporcodigo/:codigo", async(req,res)=>{
     let consulta="Delete from ciudadanos where codigo = ?";
       let [resultado]=await conexion.query(consulta,[codigo]);
 
-     res.send({resultado});
         res.send({
             estado:"ok",
             data:resultado
@@ -140,24 +174,47 @@ ciudadano.put("/ciudadano/editar/:codigo", async (req, res) => {
   }
 });
 
-ciudadano.get("/ciudadano/login/:codigo/:pass", async (req,res)=>{
-  try{
-   let codigo=req.params.codigo
-   let password=req.params.pass
-   let consulta=`select * from ciudadanos where codigo=? and pass=?`
-  let [resultado] = await conexion.query(consulta, [codigo,password]);
-
-   if (resultado.length == 0) {
-      res.send({ res: "No hay datos con el codigo: " + codigo });
-      res.send({
-        estado: "Datos vacios",
-        data: resultado,
+ciudadano.post("/ciudadano/login", async (req, res) => {
+  try {
+    const { codigo, pass } = req.body;
+    
+    // First, find the user by codigo
+    const [users] = await conexion.query('SELECT * FROM ciudadanos WHERE codigo = ?', [codigo]);
+    
+    if (users.length === 0) {
+      return res.status(401).json({
+        estado: "error",
+        mensaje: "Credenciales inválidas"
       });
     }
-    res.send({ resultado });
-    res.send({
+    
+    const user = users[0];
+    
+    // Compare the provided password with the hashed password in the database
+    const isPasswordValid = await bcrypt.compare(pass, user.pass);
+    
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        estado: "error",
+        mensaje: "Credenciales inválidas"
+      });
+    }
+    
+    // Create token payload (exclude sensitive data)
+    const userData = { ...user };
+    delete userData.pass; // Don't include password in the token
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.codigo, rol: user.rol },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+    
+    res.status(200).json({
       estado: "ok",
-      data: resultado,
+      token,
+      user: userData
     });
   }catch(err){
  res.status(500).send({
@@ -166,5 +223,16 @@ ciudadano.get("/ciudadano/login/:codigo/:pass", async (req,res)=>{
     })
   }
 })
+
+ciudadano.get("/ciudadano/qr/:codigo", async (req, res) => {
+  try {
+    const codigo = req.params.codigo;
+    // Generar QR con el valor del código
+    const qrDataUrl = await QRCode.toDataURL(codigo);
+    res.status(200).json({ qr: qrDataUrl });
+  } catch (err) {
+    res.status(500).json({ error: "Error generando el QR" });
+  }
+});
 
 export default ciudadano;
