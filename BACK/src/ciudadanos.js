@@ -194,6 +194,30 @@ ciudadano.put("/ciudadano/editar/:codigo", verificarToken, verificarPolicia, asy
   }
 });
 
+// RUTA TEMPORAL SOLO PARA PRUEBAS - ELIMINAR EN PRODUCCIÓN
+ciudadano.post("/ciudadano/generar-token-prueba", async (req, res) => {
+  try {
+    // Token temporal para pruebas
+    const tokenPrueba = jwt.sign(
+      { id: "PRUEBA", rol: "policia" },
+      CLAVE_JWT_SECRETA,
+      { expiresIn: TIEMPO_EXPIRACION_JWT }
+    );
+    
+    res.status(200).json({
+      estado: "ok",
+      mensaje: "Token de prueba generado",
+      token: tokenPrueba,
+      nota: "⚠️ Solo para pruebas - Eliminar en producción"
+    });
+  } catch(err) {
+    res.status(500).json({
+      estado: "error",
+      mensaje: "Error generando token de prueba"
+    });
+  }
+});
+
 ciudadano.post("/ciudadano/login", async (req, res) => {
   try {
     const { codigo, pass } = req.body;
@@ -218,11 +242,9 @@ ciudadano.post("/ciudadano/login", async (req, res) => {
       });
     }
     
-    // Crear payload del token (excluir datos sensibles)
     const datosUsuario = { ...usuario };
-    delete datosUsuario.pass; // No incluir contraseña en el token
+    delete datosUsuario.pass; 
     
-    // Generar token JWT
     const token = jwt.sign(
       { id: usuario.codigo, rol: usuario.rol },
       CLAVE_JWT_SECRETA,
