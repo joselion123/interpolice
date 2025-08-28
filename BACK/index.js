@@ -10,7 +10,7 @@ import crimenes from "./src/crimenes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Cargar variables de entorno
+require('dotenv').config();
 dotenv.config();
 
 const app = express();
