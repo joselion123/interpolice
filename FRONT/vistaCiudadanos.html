@@ -345,7 +345,7 @@
     </style>
 </head>
 <body>
-    <button class="logout-btn" onclick="logout()">🚪 Cerrar Sesión</button>
+    <button class="logout-btn" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
 
     <div class="header">
         <h1>INTERPOLICE GALÁCTICO</h1>
@@ -458,5 +458,9 @@
     </div>
 
 </body>
+<script type="module">
+    import { cerrarSesion } from './src/js/auth.js';
+    window.cerrarSesion = cerrarSesion;
+</script>
 <script src="./src/js/vistaCiudadano.js" type="module"></script>
 </html>

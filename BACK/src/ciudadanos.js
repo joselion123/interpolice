@@ -7,8 +7,33 @@ import { upload, handleMulterErrors } from './config/multerConfig.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = 'tu_clave_secreta_super_segura';
-const JWT_EXPIRES_IN = '1h'; // Token expires in 1 hour
+const CLAVE_JWT_SECRETA = process.env.JWT_SECRET || 'tu_clave_secreta_super_segura';
+const TIEMPO_EXPIRACION_JWT = process.env.JWT_EXPIRES_IN || '1h';
+
+// Middleware para verificar JWT
+const verificarToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ estado: 'error', mensaje: 'Token requerido' });
+  }
+  
+  try {
+    const datosDecodificados = jwt.verify(token, CLAVE_JWT_SECRETA);
+    req.usuario = datosDecodificados;
+    next();
+  } catch (error) {
+    return res.status(401).json({ estado: 'error', mensaje: 'Token inválido' });
+  }
+};
+
+// Middleware para verificar rol de policía
+const verificarPolicia = (req, res, next) => {
+  if (req.usuario.rol !== 'policia') {
+    return res.status(403).json({ estado: 'error', mensaje: 'Acceso denegado - Se requiere rol de policía' });
+  }
+  next();
+};
 
 // Obtener el directorio actual
 const __filename = fileURLToPath(import.meta.url);
@@ -19,7 +44,7 @@ let ciudadano = express.Router();
 // Configuración para servir archivos estáticos
 ciudadano.use('/uploads', express.static(path.join(__dirname, '../../public/uploads')));
 
-ciudadano.get("/ciudadano/listarTodos", async(req,res)=>{
+ciudadano.get("/ciudadano/listarTodos", verificarToken, verificarPolicia, async(req,res)=>{
     let consulta= "SELECT * FROM ciudadanos";
 
     try{
@@ -36,7 +61,7 @@ ciudadano.get("/ciudadano/listarTodos", async(req,res)=>{
     }
 });
 
-ciudadano.post("/ciudadano/insertar", (req, res, next) => {
+ciudadano.post("/ciudadano/insertar", verificarToken, verificarPolicia, (req, res, next) => {
     upload(req, res, function(err) {
         if (err) {
             return res.status(400).json({
@@ -69,7 +94,7 @@ ciudadano.post("/ciudadano/insertar", (req, res, next) => {
       codigo_qr: req.body.codigo_qr,
       estado: req.body.estado,
       rol: req.body.rol,
-      pass: hashedPassword, // Store the hashed password
+      pass: hashedPassword, 
     };
 
     const consulta = "INSERT INTO ciudadanos SET ?";
@@ -77,12 +102,11 @@ ciudadano.post("/ciudadano/insertar", (req, res, next) => {
 
     res.status(200).json({ 
       mensaje: "Ciudadano insertado correctamente",
-      fotoUrl: fotoPath // Opcional: devolver la URL de la imagen
+      fotoUrl: fotoPath //   URL de la imagen
     });
   } catch (err) {
     console.error("Error al insertar ciudadano:", err.message);
     
-    // Si hay un error, eliminar el archivo subido si existe
     if (req.file) {
       const fs = await import('fs');
       const filePath = path.join(__dirname, '../../public/uploads', req.file.filename);
@@ -98,7 +122,7 @@ ciudadano.post("/ciudadano/insertar", (req, res, next) => {
   }
 });
 
-ciudadano.get("/ciudadano/buscarporcodigo/:codigo", async (req, res) => {
+ciudadano.get("/ciudadano/buscarporcodigo/:codigo", verificarToken, async (req, res) => {
   
   try {
     let codigo = req.params.codigo;
@@ -127,7 +151,7 @@ ciudadano.get("/ciudadano/buscarporcodigo/:codigo", async (req, res) => {
   }
 });
 
-ciudadano.delete("/ciudadano/eliminarporcodigo/:codigo", async(req,res)=>{
+ciudadano.delete("/ciudadano/eliminarporcodigo/:codigo", verificarToken, verificarPolicia, async(req,res)=>{
   let codigo=req.params.codigo;
   try{
     
@@ -147,7 +171,7 @@ ciudadano.delete("/ciudadano/eliminarporcodigo/:codigo", async(req,res)=>{
   }
 })
 
-ciudadano.put("/ciudadano/editar/:codigo", async (req, res) => {
+ciudadano.put("/ciudadano/editar/:codigo", verificarToken, verificarPolicia, async (req, res) => {
   try {
     const codigo=req.params.codigo
     const datosCiudadano = {
@@ -174,41 +198,41 @@ ciudadano.post("/ciudadano/login", async (req, res) => {
   try {
     const { codigo, pass } = req.body;
     
-    const [users] = await conexion.query('SELECT * FROM ciudadanos WHERE codigo = ?', [codigo]);
+    const [usuarios] = await conexion.query('SELECT * FROM ciudadanos WHERE codigo = ?', [codigo]);
     
-    if (users.length === 0) {
+    if (usuarios.length === 0) {
       return res.status(401).json({
         estado: "error",
         mensaje: "Credenciales inválidas"
       });
     }
     
-    const user = users[0];
+    const usuario = usuarios[0];
     
-    const isPasswordValid = await bcrypt.compare(pass, user.pass);
+    const esPasswordValido = await bcrypt.compare(pass, usuario.pass);
     
-    if (!isPasswordValid) {
+    if (!esPasswordValido) {
       return res.status(401).json({
         estado: "error",
         mensaje: "Credenciales inválidas"
       });
     }
     
-    // Create token payload (exclude sensitive data)
-    const userData = { ...user };
-    delete userData.pass; // Don't include password in the token
+    // Crear payload del token (excluir datos sensibles)
+    const datosUsuario = { ...usuario };
+    delete datosUsuario.pass; // No incluir contraseña en el token
     
-    // Generate JWT token
+    // Generar token JWT
     const token = jwt.sign(
-      { id: user.codigo, rol: user.rol },
-      JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
+      { id: usuario.codigo, rol: usuario.rol },
+      CLAVE_JWT_SECRETA,
+      { expiresIn: TIEMPO_EXPIRACION_JWT }
     );
     
     res.status(200).json({
       estado: "ok",
       token,
-      user: userData
+      user: datosUsuario
     });
   }catch(err){
  res.status(500).send({
@@ -218,7 +242,7 @@ ciudadano.post("/ciudadano/login", async (req, res) => {
   }
 })
 
-ciudadano.get("/ciudadano/qr/:codigo", async (req, res) => {
+ciudadano.get("/ciudadano/qr/:codigo", verificarToken, async (req, res) => {
   try {
     const codigo = req.params.codigo;
     // Generar QR con el valor del código

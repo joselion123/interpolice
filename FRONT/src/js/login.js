@@ -1,4 +1,3 @@
-// API Base URL
 const API_BASE = 'http://localhost:4300';
 
 const loginForm = document.getElementById('loginForm');
@@ -37,13 +36,11 @@ async function handleLogin(e) {
         const data = await response.json();
         
         if (response.ok && data.estado === 'ok') {
-            // Store token and user data
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('userData', JSON.stringify(data.user));
-            sessionStorage.setItem('codigo', codigo);
+            localStorage.setItem('tokenSesion', data.token);
+            localStorage.setItem('datosUsuario', JSON.stringify(data.user));
+            sessionStorage.setItem('codigoUsuario', codigo);
             showAlert('¡Acceso concedido! Bienvenido al sistema', 'success');
             
-            // Redirect based on user role
             setTimeout(() => {
                 if (data.user.rol === 'policia') {
                     window.location.href = '../vistaPolicia.html';
@@ -78,18 +75,15 @@ function togglePassword() {
     }
 }
 
-// Handle forgot password
 function forgotPassword() {
     showAlert('Contacte al administrador del sistema galáctico para recuperar su acceso.', 'info');
 }
 
-// Go to register page
 function goToRegister() {
     window.location.href = 'agregarCiudadanos.html';
 }
 
 
-// Set loading state
 function setLoadingState(isLoading) {
     if (isLoading) {
         loginBtn.disabled = true;
@@ -104,7 +98,6 @@ function setLoadingState(isLoading) {
 
 // Show alert messages
 function showAlert(message, type = 'info') {
-    // Create alert element
     const alert = document.createElement('div');
     alert.className = `alert alert-${type} alert-dismissible fade show`;
     alert.style.cssText = `
@@ -127,10 +120,8 @@ function showAlert(message, type = 'info') {
         <button type="button" class="btn-close" onclick="this.parentElement.remove()" style="color: #ffffff; opacity: 0.8;"></button>
     `;
     
-    // Add to page
     document.body.appendChild(alert);
     
-    // Auto remove after 5 seconds
     setTimeout(() => {
         if (alert.parentElement) {
             alert.remove();

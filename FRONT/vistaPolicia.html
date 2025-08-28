@@ -677,7 +677,7 @@
 
 
         </div>
-        <button class="logout-btn" onclick="logout()">🚪 Cerrar Sesión</button>
+        <button class="logout-btn" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
     </div>
 
 
@@ -700,7 +700,6 @@
                 </button>
             </div>
 
-            <!-- Escáner QR -->
             <div class="qr-scanner active" id="qrScanner">
                 <div style="font-size: 3em; margin-bottom: 10px;">📷</div>
                 <p>Apunte la cámara al código QR del ciudadano</p>
@@ -865,5 +864,10 @@
 </div>
 
 </body>
+<script type="module">
+    import { cerrarSesion } from './src/js/auth.js';
+    
+    window.cerrarSesion = cerrarSesion;
+</script>
 <script src="./src/js/vistaPolicia.js"></script>
 </html>

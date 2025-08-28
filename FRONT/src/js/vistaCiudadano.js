@@ -1,11 +1,11 @@
-let codigoglobal=""
+let codigoGlobal = ""
 document.addEventListener('DOMContentLoaded', async () => {
-    let codigo = sessionStorage.getItem('codigo');
+    let codigo = sessionStorage.getItem('codigoUsuario');
     if (!codigo) {
         window.location.href = "../../index.html";
         return;
-    }else{
-        codigoglobal=codigo
+    } else {
+        codigoGlobal = codigo;
     }
 
     await inicializarVista();
@@ -18,13 +18,13 @@ window.addEventListener('beforeunload', () => {
 let citizenData = {};
 
 async function inicializarVista() {
-    const datosCiudadano = await Buscarporcodigo();
+    const datosCiudadano = await buscarPorCodigo();
     
-    console.log("Código buscado:", codigoglobal);
+    console.log("Código buscado:", codigoGlobal);
     console.log("Datos recibidos:", datosCiudadano);
     
     if (!datosCiudadano || datosCiudadano.length === 0) {
-        alert(`❌ No se encontró el ciudadano con código: ${codigoglobal}`);
+        alert(`❌ No se encontró el ciudadano con código: ${codigoGlobal}`);
         return;
     }
 
@@ -48,9 +48,16 @@ async function inicializarVista() {
     await cargarCrimenes();
 }
 
-async function Buscarporcodigo() {
-    const urll = `http://localhost:4300/ciudadano/buscarporcodigo/${codigoglobal}`;
-    const response = await fetch(urll);
+async function buscarPorCodigo() {
+    const urll = `http://localhost:4300/ciudadano/buscarporcodigo/${codigoGlobal}`;
+    // Obtener token de localStorage
+    const token = localStorage.getItem('tokenSesion');
+    
+    const response = await fetch(urll, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
     const datos = await response.json();
     
     if (datos.estado === "ok") {
@@ -84,8 +91,15 @@ function loadCitizenData() {
 
 async function traerCrimenesPorCodigo() {
     try {
-        const url = `http://localhost:4300/crimenes/porcodigo/${codigoglobal}`;
-        const response = await fetch(url);
+        const url = `http://localhost:4300/crimenes/porcodigo/${codigoGlobal}`;
+        // Obtener token de localStorage
+        const token = localStorage.getItem('tokenSesion');
+        
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         const datos = await response.json();
         
         console.log("Crímenes obtenidos:", datos);
@@ -168,13 +182,17 @@ function renderizarCrimenes(crimenes) {
     crimesList.innerHTML = crimenesHTML;
 }
 
-// Función para cerrar sesión
-function logout() {
+function cerrarSesion() {
     sessionStorage.clear();
+    localStorage.removeItem('tokenSesion');
+    localStorage.removeItem('datosUsuario');
     window.location.href = "../../index.html";
 }
 
-// Función para imprimir antecedentes
+function logout() {
+    cerrarSesion();
+}
+
 function printRecord() {
     window.print();
 }

@@ -2,6 +2,18 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal } from 'bootstrap';
 import Swal  from 'sweetalert2';
 
+function obtenerTokenAuth() {
+    return localStorage.getItem('tokenSesion');
+}
+
+function obtenerCabecerasAuth() {
+    const token = obtenerTokenAuth();
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+}
+
 const url = "http://localhost:4300/ciudadano/";
 document.addEventListener('DOMContentLoaded', cargarDatos); 
 async function cargarCiudadanos(ciudadanos) {
@@ -15,7 +27,12 @@ async function cargarCiudadanos(ciudadanos) {
             const fila = document.createElement("tr");
             let qrImg = '';
             try {
-                const qrResp = await fetch(`http://localhost:4300/ciudadano/qr/${ciudadano.codigo}`);
+                const token = obtenerTokenAuth();
+                const qrResp = await fetch(`http://localhost:4300/ciudadano/qr/${ciudadano.codigo}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const qrData = await qrResp.json();
                 qrImg = `<img src='${qrData.qr}' width='60' />`;
             } catch (err) {
@@ -49,21 +66,30 @@ async function cargarCiudadanos(ciudadanos) {
 }
 
 function cargarDatos() {
-    fetch(url+'listartodos')
+    const token = obtenerTokenAuth();
+    fetch(url+'listartodos', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
         .then(response => response.json())
         .then((datos) => {
-            cargarCiudadanos(datos.resultado);
-                  console.log("Respuesta del backend:", datos); 
-
+            cargarCiudadanos(datos.data);
+            console.log("Respuesta del backend:", datos); 
         })
         .catch(err => console.log("Error en fetch:", err.message));
 }
 
-async function Buscarporcodigo(codigo) {
+async function buscarPorCodigo(codigo) {
   const urll = `http://localhost:4300/ciudadano/buscarporcodigo/${codigo}`;
-  const response = await fetch(urll);
+  const token = obtenerTokenAuth();
+  const response = await fetch(urll, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
   const datos = await response.json();
-  return datos.resultado;
+  return datos.data;
 }
 
 document.addEventListener('click', async (e) => {
@@ -81,7 +107,13 @@ document.addEventListener('click', async (e) => {
       if (respuesta.isConfirmed) {
         try {
           const url = `http://localhost:4300/ciudadano/eliminarporcodigo/${codigo}`;
-          const resp = await fetch(url, { method: 'DELETE' });
+          const token = obtenerTokenAuth();
+          const resp = await fetch(url, { 
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
           
           if (resp.ok) {
             Swal.fire('Éxito', 'Eliminado', 'success');
@@ -100,7 +132,7 @@ document.addEventListener('click', async (e) => {
     const codigo = e.target.dataset.codigo;
     const modalEdicion = new Modal(document.querySelector('#modalEdicion'));
 
-    const ciudadano = (await Buscarporcodigo(codigo))[0];
+    const ciudadano = (await buscarPorCodigo(codigo))[0];
 
     if (ciudadano) {
       modalEdicion.show();
@@ -136,9 +168,7 @@ document.addEventListener('click', async (e) => {
     try {
         const respuesta = await fetch(url + 'editar/' + codigo, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: obtenerCabecerasAuth(),
             body: JSON.stringify(datosCiudadano)
         });
         const resultado = await respuesta.json();
