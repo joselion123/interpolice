@@ -10,7 +10,6 @@ import crimenes from "./src/crimenes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-require('dotenv').config();
 dotenv.config();
 
 const app = express();
@@ -34,8 +33,8 @@ app.get("/", (req, res) => {
 });
 
 // Iniciar el servidor
-const puerto = process.env.APP_PORT || 4300;
-app.listen(puerto, () => {
+const puerto = process.env.PORT || process.env.APP_PORT || 4300;
+app.listen(puerto, '0.0.0.0', () => {
     console.log(`API ejecutándose en el puerto ${puerto}`);
     console.log(`URL base: http://localhost:${puerto}`);
 });
