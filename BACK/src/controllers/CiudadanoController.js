@@ -9,8 +9,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const CLAVE_JWT_SECRETA = process.env.JWT_SECRET || 'tu_clave_secreta_super_segura';
-const TIEMPO_EXPIRACION_JWT = process.env.JWT_EXPIRES_IN || '1h';
+const CLAVE_JWT_SECRETA = process.env.JWT_SECRET ;
+const TIEMPO_EXPIRACION_JWT = process.env.JWT_EXPIRES_IN ;
 
 class CiudadanoController {
 
@@ -201,7 +201,7 @@ class CiudadanoController {
         });
       }
       
-      // Crear payload del token (excluir datos sensibles)
+      // Crear payload del token
       const datosUsuario = { ...usuario };
       delete datosUsuario.pass;
       
@@ -236,31 +236,7 @@ class CiudadanoController {
       console.error("Error generando QR:", err.message);
       res.status(500).json({ error: "Error generando el QR" });
     }
-  }
-
-  // RUTA TEMPORAL SOLO PARA PRUEBAS - ELIMINAR EN PRODUCCIÓN
-  static async generarTokenPrueba(req, res) {
-    try {
-      const tokenPrueba = jwt.sign(
-        { id: "PRUEBA", rol: "policia" },
-        CLAVE_JWT_SECRETA,
-        { expiresIn: TIEMPO_EXPIRACION_JWT }
-      );
-      
-      res.status(200).json({
-        estado: "ok",
-        mensaje: "Token de prueba generado",
-        token: tokenPrueba,
-        nota: "⚠️ Solo para pruebas - Eliminar en producción"
-      });
-    } catch (err) {
-      console.error("Error generando token de prueba:", err.message);
-      res.status(500).json({
-        estado: "error",
-        mensaje: "Error generando token de prueba"
-      });
-    }
-  }
+  }  
 }
 
 export default CiudadanoController;

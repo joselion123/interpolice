@@ -29,41 +29,20 @@ const fileFilter = (req, file, cb) => {
         return cb(null, true);
     }
     
-    // Create error object with status code
     const error = new Error('Solo se permiten archivos de imagen (jpeg, jpg, png, gif)');
     error.status = 400;
     cb(error, false);
 };
 
-// Configuración de Multer
 const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
         fileSize: 5 * 1024 * 1024, // Límite de 5MB
-        files: 1 // Solo permitir un archivo por solicitud
+        files: 1 
     }
-}).single('foto'); // 'foto' es el nombre del campo en el formulario
+}).single('foto'); 
 
-// Middleware para manejar errores de Multer
-const handleMulterErrors = (err, req, res, next) => {
-    if (err instanceof multer.MulterError) {
-        // Un error de Multer (ej: archivo muy grande)
-        return res.status(400).json({
-            estado: 'error',
-            mensaje: `Error al subir el archivo: ${err.message}`
-        });
-    } else if (err) {
-        // Un error del fileFilter u otro error
-        return res.status(err.status || 500).json({
-            estado: 'error',
-            mensaje: err.message || 'Error al procesar el archivo'
-        });
-    }
-    // Si no hay errores, continuar
-    next();
-};
-
-export { upload, handleMulterErrors };
+export { upload };
 
 export default upload;
